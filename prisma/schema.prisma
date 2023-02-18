@@ -1,0 +1,60 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider     = "mysql"
+  url          = env("DATABASE_URL")
+  relationMode = "prisma"
+}
+
+model Project {
+  id      Int            @id @default(autoincrement())
+  slug    String
+  name    String
+  excerpt String
+  image   String
+  content String         @db.LongText
+  stack   ProjectStack[]
+}
+
+model Challenge {
+  id      Int              @id @default(autoincrement())
+  slug    String
+  name    String
+  excerpt String
+  image   String
+  content String           @db.LongText
+  stack   ChallengeStack[]
+}
+
+model ChallengeStack {
+  id          Int       @id @default(autoincrement())
+  challenge   Challenge @relation(fields: [challengeId], references: [id])
+  challengeId Int
+  tech        Tech      @relation(fields: [techId], references: [id])
+  techId      Int
+
+  @@unique([challengeId, techId])
+  @@index([challengeId])
+  @@index([techId])
+}
+
+model ProjectStack {
+  id        Int     @id @default(autoincrement())
+  project   Project @relation(fields: [projectId], references: [id])
+  projectId Int
+  tech      Tech    @relation(fields: [techId], references: [id])
+  techId    Int
+
+  @@unique([projectId, techId])
+  @@index([projectId])
+  @@index([techId])
+}
+
+model Tech {
+  id             Int              @id @default(autoincrement())
+  name           String
+  ChallengeStack ChallengeStack[]
+  ProjectStack   ProjectStack[]
+}
